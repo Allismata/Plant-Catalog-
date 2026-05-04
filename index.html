@@ -380,8 +380,23 @@ function renderPlants() {
     const status = isClaimed ? `Claimed by ${escapeHtml(claim.claimer || "someone")}` : "Available to claim";
     return `
       <article class="card" id="plant-${p.id}">
-        <img class="photo" src="${p.image}" alt="Plant ${p.id}" loading="lazy">
-        <div class="content">
+<img 
+  class="photo" 
+  src="./${p.image}" 
+  alt="Plant ${p.id}" 
+  loading="lazy"
+  onerror="this.style.display='none'"
+    if (!this.dataset.triedImages) {
+      this.dataset.triedImages = '1';
+      this.src = 'images/' + this.getAttribute('src');
+    } else if (this.dataset.triedImages === '1') {
+      this.dataset.triedImages = '2';
+      this.src = this.getAttribute('src').replace('.jpg', '.jpeg');
+    } else {
+      this.style.display = 'none';
+    }
+  "
+>        <div class="content">
           <div class="topline">
             <div class="plant-id">Plant ${p.id}</div>
             <div class="badge">${p.floor} floor</div>
