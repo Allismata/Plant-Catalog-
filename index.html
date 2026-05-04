@@ -372,7 +372,10 @@ function renderPlants() {
     const searchMatch = normalize(text).includes(normalize(searchText));
     return floorMatch && searchMatch;
   });
-
+const typedNames = {};
+document.querySelectorAll("input.name").forEach(input => {
+  typedNames[input.id] = input.value;
+});
   grid.innerHTML = filtered.map(p => {
     const claim = claims[p.id];
     const isClaimed = !!claim?.claimed;
@@ -408,8 +411,7 @@ function renderPlants() {
           <div class="status ${isClaimed ? "claimed" : ""}" id="status-${p.id}">${status}</div>
           <div class="actions">
             <div class="claim-row ${isClaimed ? "hidden" : ""}">
-              <input class="name" id="input-${p.id}" placeholder="Your name" autocomplete="name" />
-              <button class="btn" onclick="claimPlant(${p.id})">Claim</button>
+<input class="name" id="input-${p.id}" placeholder="Your name" autocomplete="name" value="${escapeHtml(typedNames[`input-${p.id}`] || "")}" />              <button class="btn" onclick="claimPlant(${p.id})">Claim</button>
             </div>
             <button class="btn secondary ${isMine ? "" : "hidden"}" onclick="unclaimMine(${p.id})">Unclaim my plant</button>
             <button class="btn danger ${adminMode ? "" : "hidden"}" onclick="adminUnclaim(${p.id})">Admin unclaim</button>
