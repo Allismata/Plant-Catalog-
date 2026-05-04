@@ -500,13 +500,6 @@ document.querySelectorAll(".filter").forEach(btn => {
 });
 
 loadClaims();
-setInterval(() => {
-  const active = document.activeElement;
-  const typing = active && active.classList.contains("name");
-
-  if (!typing) {
-    loadClaims();
-  }
-}, 3000);</script>
+</script>
 </body>
 </html>
