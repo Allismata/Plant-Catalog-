@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -386,99 +387,82 @@ button:hover { background: #f0f0ec; }
     </div>
 </div>
 <script>
-const STORAGE_KEY = 'officePlantAdoptionClaims';
-let claimed = loadClaims();
-let currentFilter = 'all';
-
-function loadClaims() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-  } catch (error) {
-    return {};
-  }
-}
-
-function saveClaims() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(claimed));
-}
-
+const claimed = {};
 function claim(n) {
   const input = document.getElementById('input-' + n);
   const name = input.value.trim();
-
-  if (!name) {
-    input.style.borderColor = '#e24b4a';
-    input.focus();
-    return;
-  }
-
+  if (!name) { input.style.borderColor = '#e24b4a'; return; }
   input.style.borderColor = '#ccc';
   claimed[n] = name;
-  saveClaims();
-  renderPlant(n);
+  document.getElementById('status-' + n).textContent = 'Claimed by ' + name;
+  document.getElementById('status-' + n).className = 'status claimed-tag';
+  document.getElementById('plant-' + n).classList.add('claimed');
+  input.disabled = true;
+  input.closest('.card').querySelector('button').disabled = true;
+  input.closest('.card').querySelector('button').textContent = 'Claimed';
   updateCounts();
-  applyCurrentFilter();
 }
-
-function renderPlant(n) {
-  const input = document.getElementById('input-' + n);
-  const status = document.getElementById('status-' + n);
-  const card = document.getElementById('plant-' + n);
-  const button = card.querySelector('button');
-  const name = claimed[n];
-
-  if (name) {
-    status.textContent = 'Claimed by ' + name;
-    status.className = 'status claimed-tag';
-    card.classList.add('claimed');
-    input.value = name;
-    input.disabled = true;
-    button.disabled = true;
-    button.textContent = 'Claimed';
-  } else {
-    status.textContent = 'Available';
-    status.className = 'status available';
-    card.classList.remove('claimed');
-    input.value = '';
-    input.disabled = false;
-    button.disabled = false;
-    button.textContent = 'Claim ↗';
-  }
-}
-
-function renderAllPlants() {
-  document.querySelectorAll('.card').forEach(card => {
-    const n = card.id.replace('plant-', '');
-    renderPlant(n);
-  });
-  updateCounts();
-  applyCurrentFilter();
-}
-
 function updateCounts() {
-  const total = document.querySelectorAll('.card').length;
+  const total = 26;
   const c = Object.keys(claimed).length;
   document.getElementById('count-claimed').textContent = c;
   document.getElementById('count-available').textContent = total - c;
 }
-
 function filter(type, btn) {
-  currentFilter = type;
   document.querySelectorAll('.filter-bar button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  applyCurrentFilter();
-}
-
-function applyCurrentFilter() {
   document.querySelectorAll('.card').forEach(card => {
     const isClaimed = card.classList.contains('claimed');
-    if (currentFilter === 'all') card.style.display = '';
-    else if (currentFilter === 'available') card.style.display = isClaimed ? 'none' : '';
-    else if (currentFilter === 'claimed') card.style.display = isClaimed ? '' : 'none';
+    if (type === 'all') card.style.display = '';
+    else if (type === 'available') card.style.display = isClaimed ? 'none' : '';
+    else if (type === 'claimed') card.style.display = isClaimed ? '' : 'none';
+  });
+}
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const supabase = window.supabase.createClient(
+  "https://gtlgilasbrofdypixutx.supabase.co",
+  "sb_publishable_TOKRtRulLWFoGDWLaIhWRA_2xoGfv7z"
+);
+
+async function loadPlants() {
+  const { data } = await supabase.from("plants").select("*");
+  if (!data) return;
+
+  data.forEach(p => {
+    if (p.claimed) {
+      const card = document.getElementById(`plant-${p.id}`);
+      const status = document.getElementById(`status-${p.id}`);
+
+      if (!card) return;
+
+      card.classList.add("claimed");
+      status.textContent = `Claimed by ${p.claimer}`;
+      status.classList.remove("available");
+      status.classList.add("claimed-tag");
+    }
   });
 }
 
-document.addEventListener('DOMContentLoaded', renderAllPlants);
+async function claim(id) {
+  const input = document.getElementById(`input-${id}`);
+  const name = input.value.trim();
+
+  if (!name) return alert("Enter your name");
+
+  await supabase.from("plants").upsert({
+    id: id,
+    claimed: true,
+    claimer: name,
+    claimed_at: new Date()
+  });
+
+  loadPlants();
+}
+
+setInterval(loadPlants, 2000);
+loadPlants();
 </script>
 </body>
 </html>
