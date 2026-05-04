@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plant Adoption</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root { --green:#2f6b4f; --green2:#eaf5ee; --ink:#18201b; --muted:#66706a; --line:#e3e9e5; --bg:#f7f8f4; --card:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:var(--bg); color:var(--ink); }
+    .hero { padding:42px 24px 26px; background:linear-gradient(120deg,#ffffff,#eff7f0); border-bottom:1px solid var(--line); }
+    .wrap { max-width:1180px; margin:0 auto; }
+    h1 { margin:0; font-size:42px; line-height:1.05; letter-spacing:-1px; }
+    .sub { margin:12px 0 0; color:var(--muted); font-size:16px; max-width:720px; }
+    .toolbar { display:grid; grid-template-columns: 1fr auto; gap:14px; align-items:center; padding:20px 24px; position:sticky; top:0; z-index:10; background:rgba(247,248,244,.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--line); }
+    .search { width:100%; border:1px solid var(--line); border-radius:16px; padding:14px 16px; font-size:16px; background:#fff; outline:none; }
+    .filters { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    .filter { border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:999px; padding:10px 14px; cursor:pointer; font-weight:650; }
+    .filter.active { background:var(--green); color:#fff; border-color:var(--green); }
+    .stats { color:var(--muted); padding:0 24px 18px; font-size:14px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:18px; padding:0 24px 42px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:24px; overflow:hidden; box-shadow:0 10px 30px rgba(18,32,22,.06); display:flex; flex-direction:column; min-height:100%; }
+    .photo { width:100%; aspect-ratio: 4 / 5; object-fit:cover; background:#e8ece8; display:block; }
+    .content { padding:16px; display:flex; flex-direction:column; gap:12px; flex:1; }
+    .topline { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .plant-id { font-weight:800; font-size:18px; }
+    .badge { border-radius:999px; padding:6px 10px; font-size:12px; font-weight:800; background:var(--green2); color:var(--green); }
+    .meta { display:grid; gap:6px; color:var(--muted); font-size:14px; }
+    .meta strong { color:var(--ink); }
+    .status { border-radius:16px; padding:12px; background:#f1f5f2; color:var(--muted); font-size:14px; min-height:44px; }
+    .status.claimed { background:#e7f3eb; color:#214f39; font-weight:750; }
+    .actions { margin-top:auto; display:grid; gap:8px; }
+    .claim-row { display:grid; grid-template-columns:1fr auto; gap:8px; }
+    input.name { border:1px solid var(--line); border-radius:14px; padding:11px 12px; font-size:14px; min-width:0; }
+    button { font:inherit; }
+    .btn { border:none; border-radius:14px; padding:11px 13px; font-weight:800; cursor:pointer; background:var(--green); color:#fff; }
+    .btn:disabled { background:#cfd8d2; color:#6d7a71; cursor:not-allowed; }
+    .secondary { background:#fff; color:var(--green); border:1px solid var(--line); }
+    .danger { background:#fff; color:#8a342b; border:1px solid #f0d8d4; }
+    .hidden { display:none !important; }
+    .empty { text-align:center; color:var(--muted); padding:44px 20px; }
+    @media (max-width:720px){ h1{font-size:32px}.toolbar{grid-template-columns:1fr}.filters{justify-content:flex-start}.hero{padding-top:30px}.grid{grid-template-columns:1fr}.claim-row{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <h1>Plant Adoption</h1>
+      <p class="sub">Browse available office plants, search by floor or room, and claim one. Claimed plants stay saved and sync across devices.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="toolbar">
+      <input id="searchInput" class="search" type="search" placeholder="Search by floor, room, or plant number..." />
+      <div class="filters">
+        <button class="filter active" data-floor="all">All</button>
+        <button class="filter" data-floor="8th">8th floor</button>
+        <button class="filter" data-floor="11th">11th floor</button>
+        <button class="filter" data-floor="12th">12th floor</button>
+        <button class="filter" data-floor="available">Available</button>
+      </div>
+    </section>
+    <div class="stats" id="stats"></div>
+    <section id="plantGrid" class="grid"></section>
+    <div id="emptyState" class="empty hidden">No plants match that search.</div>
+  </main>
+
+<script>
+const SUPABASE_URL = "https://gtlgilasbrofdypixutx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_TOKRtRulLWFoGDWLaIhWRA_2xoGfv7z";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const ADMIN_PASSWORD = "plantadmin"; // Change this before sharing if you want admin unclaim.
+const plants = [
+  {
+    "id": 1,
+    "size": "5'3\"",
+    "floor": "12th",
+    "room": "Reception",
+    "image": "images/plant-1.jpg"
+  },
+  {
+    "id": 2,
+    "size": "4'10\"",
+    "floor": "12th",
+    "room": "Waiting Room",
+    "image": "images/plant-2.jpg"
+  },
+  {
+    "id": 3,
+    "size": "4'11\"",
+    "floor": "12th",
+    "room": "Dome",
+    "image": "images/plant-3.jpg"
+  },
+  {
+    "id": 4,
+    "size": "6'11\"",
+    "floor": "12th",
+    "room": "Waiting Room",
+    "image": "images/plant-4.jpg"
+  },
+  {
+    "id": 5,
+    "size": "6'6\"",
+    "floor": "12th",
+    "room": "Barrel",
+    "image": "images/plant-5.jpg"
+  },
+  {
+    "id": 6,
+    "size": "2'10\"",
+    "floor": "11th",
+    "room": "Meeting Room",
+    "image": "images/plant-6.jpg"
+  },
+  {
+    "id": 7,
+    "size": "3'7\"",
+    "floor": "11th",
+    "room": "Meeting Room",
+    "image": "images/plant-7.jpg"
+  },
+  {
+    "id": 8,
+    "size": "6'6\"",
+    "floor": "11th",
+    "room": "Meeting Room",
+    "image": "images/plant-8.jpg"
+  },
+  {
+    "id": 9,
+    "size": "1'11\"",
+    "floor": "11th",
+    "room": "Meeting Room",
+    "image": "images/plant-9.jpg"
+  },
+  {
+    "id": 10,
+    "size": "0'7\"",
+    "floor": "11th",
+    "room": "Meeting Room",
+    "image": "images/plant-10.jpg"
+  },
+  {
+    "id": 11,
+    "size": "1'10\"",
+    "floor": "11th",
+    "room": "Meeting Room",
+    "image": "images/plant-11.jpg"
+  },
+  {
+    "id": 12,
+    "size": "1'11\"",
+    "floor": "11th",
+    "room": "Meeting Room",
+    "image": "images/plant-12.jpg"
+  },
+  {
+    "id": 13,
+    "size": "6'5\"",
+    "floor": "11th",
+    "room": "Meeting Room",
+    "image": "images/plant-13.jpg"
+  },
+  {
+    "id": 14,
+    "size": "4'7\"",
+    "floor": "11th",
+    "room": "Paradigm Sign",
+    "image": "images/plant-14.jpg"
+  },
+  {
+    "id": 15,
+    "size": "4'7\"",
+    "floor": "11th",
+    "room": "Paradigm Sign",
+    "image": "images/plant-15.jpg"
+  },
+  {
+    "id": 16,
+    "size": "4'7\"",
+    "floor": "11th",
+    "room": "Paradigm Sign",
+    "image": "images/plant-16.jpg"
+  },
+  {
+    "id": 17,
+    "size": "6'5\"",
+    "floor": "11th",
+    "room": "Work Zone I&R",
+    "image": "images/plant-17.jpg"
+  },
+  {
+    "id": 18,
+    "size": "8'",
+    "floor": "11th",
+    "room": "Work Zone I&R",
+    "image": "images/plant-18.jpg"
+  },
+  {
+    "id": 19,
+    "size": "~8'2\"",
+    "floor": "11th",
+    "room": "Work Zone I&R",
+    "image": "images/plant-19.jpg"
+  },
+  {
+    "id": 20,
+    "size": "8'",
+    "floor": "11th",
+    "room": "Work Zone I&R",
+    "image": "images/plant-20.jpg"
+  },
+  {
+    "id": 21,
+    "size": "2'7\"",
+    "floor": "11th",
+    "room": "Work Zone I&R",
+    "image": "images/plant-21.jpg"
+  },
+  {
+    "id": 22,
+    "size": "6'",
+    "floor": "11th",
+    "room": "Work Zone I&R",
+    "image": "images/plant-22.jpg"
+  },
+  {
+    "id": 23,
+    "size": "5'3\"",
+    "floor": "11th",
+    "room": "Work Zone I&R",
+    "image": "images/plant-23.jpg"
+  },
+  {
+    "id": 24,
+    "size": "8'",
+    "floor": "11th",
+    "room": "Work Zone I&R",
+    "image": "images/plant-24.jpg"
+  },
+  {
+    "id": 25,
+    "size": "5'6\"",
+    "floor": "11th",
+    "room": "Work Zone I&R",
+    "image": "images/plant-25.jpg"
+  },
+  {
+    "id": 26,
+    "size": "3'7\"",
+    "floor": "11th",
+    "room": "Work Zone I&R",
+    "image": "images/plant-26.jpg"
+  },
+  {
+    "id": 27,
+    "size": "2'6\"",
+    "floor": "8th",
+    "room": "Break Area",
+    "image": "images/plant-27.jpg"
+  },
+  {
+    "id": 28,
+    "size": "5'9\"",
+    "floor": "8th",
+    "room": "Back Break Area",
+    "image": "images/plant-28.jpg"
+  },
+  {
+    "id": 29,
+    "size": "5'5\"",
+    "floor": "8th",
+    "room": "Near Printer",
+    "image": "images/plant-29.jpg"
+  },
+  {
+    "id": 30,
+    "size": "6'",
+    "floor": "8th",
+    "room": "Murphy",
+    "image": "images/plant-30.jpg"
+  },
+  {
+    "id": 31,
+    "size": "3'9\"",
+    "floor": "8th",
+    "room": "Break Area, in front of rectangle",
+    "image": "images/plant-31.jpg"
+  },
+  {
+    "id": 32,
+    "size": "2'3\"",
+    "floor": "11th",
+    "room": "Alana's Office",
+    "image": "images/plant-32.jpg"
+  },
+  {
+    "id": 33,
+    "size": "2'",
+    "floor": "11th",
+    "room": "Alana's Office",
+    "image": "images/plant-33.jpg"
+  },
+  {
+    "id": 34,
+    "size": "3'2\"",
+    "floor": "11th",
+    "room": "Alana's Office",
+    "image": "images/plant-34.jpg"
+  },
+  {
+    "id": 35,
+    "size": "6'4\"",
+    "floor": "11th",
+    "room": "Matt's Office",
+    "image": "images/plant-35.jpg"
+  },
+  {
+    "id": 36,
+    "size": "2'8\"",
+    "floor": "11th",
+    "room": "Matt's Office",
+    "image": "images/plant-36.jpg"
+  },
+  {
+    "id": 37,
+    "size": "2'8\"",
+    "floor": "11th",
+    "room": "Work Zone",
+    "image": "images/plant-37.jpg"
+  },
+  {
+    "id": 38,
+    "size": "2'2\"",
+    "floor": "11th",
+    "room": "Work Zone",
+    "image": "images/plant-38.jpg"
+  }
+];
+let claims = {};
+let activeFloor = "all";
+let searchText = "";
+let adminMode = false;
+
+function myClaims() {
+  return JSON.parse(localStorage.getItem("myPlantClaims") || "{}");
+}
+function saveMyClaim(id, name) {
+  const current = myClaims();
+  current[id] = name;
+  localStorage.setItem("myPlantClaims", JSON.stringify(current));
+}
+function removeMyClaim(id) {
+  const current = myClaims();
+  delete current[id];
+  localStorage.setItem("myPlantClaims", JSON.stringify(current));
+}
+function normalize(value){ return String(value || "").toLowerCase(); }
+
+function renderPlants() {
+  const grid = document.getElementById("plantGrid");
+  const owned = myClaims();
+  const filtered = plants.filter(p => {
+    const claim = claims[p.id];
+    const isClaimed = !!claim?.claimed;
+    const floorMatch = activeFloor === "all" || p.floor === activeFloor || (activeFloor === "available" && !isClaimed);
+    const text = `${p.id} ${p.size} ${p.floor} ${p.room}`;
+    const searchMatch = normalize(text).includes(normalize(searchText));
+    return floorMatch && searchMatch;
+  });
+
+  grid.innerHTML = filtered.map(p => {
+    const claim = claims[p.id];
+    const isClaimed = !!claim?.claimed;
+    const isMine = owned[p.id] && owned[p.id] === claim?.claimer;
+    const status = isClaimed ? `Claimed by ${escapeHtml(claim.claimer || "someone")}` : "Available to claim";
+    return `
+      <article class="card" id="plant-${p.id}">
+        <img class="photo" src="${p.image}" alt="Plant ${p.id}" loading="lazy">
+        <div class="content">
+          <div class="topline">
+            <div class="plant-id">Plant ${p.id}</div>
+            <div class="badge">${p.floor} floor</div>
+          </div>
+          <div class="meta">
+            <div><strong>Size:</strong> ${p.size}</div>
+            <div><strong>Room:</strong> ${escapeHtml(p.room)}</div>
+          </div>
+          <div class="status ${isClaimed ? "claimed" : ""}" id="status-${p.id}">${status}</div>
+          <div class="actions">
+            <div class="claim-row ${isClaimed ? "hidden" : ""}">
+              <input class="name" id="input-${p.id}" placeholder="Your name" autocomplete="name" />
+              <button class="btn" onclick="claimPlant(${p.id})">Claim</button>
+            </div>
+            <button class="btn secondary ${isMine ? "" : "hidden"}" onclick="unclaimMine(${p.id})">Unclaim my plant</button>
+            <button class="btn danger ${adminMode ? "" : "hidden"}" onclick="adminUnclaim(${p.id})">Admin unclaim</button>
+          </div>
+        </div>
+      </article>`;
+  }).join("");
+
+  document.getElementById("emptyState").classList.toggle("hidden", filtered.length > 0);
+  const claimedCount = Object.values(claims).filter(c => c.claimed).length;
+  document.getElementById("stats").textContent = `${filtered.length} shown • ${claimedCount} claimed • ${plants.length - claimedCount} available`;
+}
+
+async function loadClaims() {
+  const { data, error } = await supabaseClient.from("plants").select("*");
+  if (error) { console.error(error); return; }
+  claims = {};
+  (data || []).forEach(row => { claims[row.id] = row; });
+  renderPlants();
+}
+
+async function claimPlant(id) {
+  const input = document.getElementById(`input-${id}`);
+  const name = (input?.value || "").trim();
+  if (!name) { alert("Please enter your name first."); return; }
+
+  const existing = claims[id];
+  if (existing?.claimed) { alert("Sorry, this plant was already claimed."); await loadClaims(); return; }
+
+  const { error } = await supabaseClient.from("plants").upsert({
+    id, claimed: true, claimer: name, claimed_at: new Date().toISOString()
+  });
+  if (error) { alert("Something went wrong while claiming. Try again."); console.error(error); return; }
+  saveMyClaim(id, name);
+  await loadClaims();
+}
+
+async function unclaimMine(id) {
+  const owned = myClaims();
+  if (!owned[id]) { alert("This browser does not recognize this as your claim."); return; }
+  if (!confirm("Unclaim this plant?")) return;
+  const { error } = await supabaseClient.from("plants").update({ claimed:false, claimer:null, claimed_at:null }).eq("id", id);
+  if (error) { alert("Could not unclaim. Try again."); console.error(error); return; }
+  removeMyClaim(id);
+  await loadClaims();
+}
+
+async function adminUnclaim(id) {
+  if (!adminMode) { alert("Admin mode is not unlocked."); return; }
+  if (!confirm("Admin unclaim this plant?")) return;
+  const { error } = await supabaseClient.from("plants").update({ claimed:false, claimer:null, claimed_at:null }).eq("id", id);
+  if (error) { alert("Could not unclaim. Try again."); console.error(error); return; }
+  removeMyClaim(id);
+  await loadClaims();
+}
+
+function escapeHtml(value) {
+  return String(value || "").replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[c]));
+}
+
+function unlockAdminMode() {
+  const password = prompt("Admin password:");
+  if (password === ADMIN_PASSWORD) {
+    adminMode = true;
+    alert("Admin mode unlocked. Admin unclaim buttons are now visible.");
+    renderPlants();
+  } else if (password !== null) {
+    alert("Incorrect password.");
+  }
+}
+
+document.addEventListener("keydown", event => {
+  if (event.shiftKey && event.key.toLowerCase() === "a") {
+    unlockAdminMode();
+  }
+});
+
+document.getElementById("searchInput").addEventListener("input", e => { searchText = e.target.value; renderPlants(); });
+document.querySelectorAll(".filter").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".filter").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeFloor = btn.dataset.floor;
+    renderPlants();
+  });
+});
+
+loadClaims();
+setInterval(loadClaims, 3000);
+</script>
+</body>
+</html>
