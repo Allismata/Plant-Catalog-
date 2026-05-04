@@ -21,7 +21,8 @@ h1 { font-size: 22px; font-weight: 500; margin-bottom: 4px; }
 .num { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.55); color: #fff; font-size: 12px; font-weight: 500; padding: 2px 7px; border-radius: 5px; }
 .info { padding: 10px 12px; }
 .plant-id { font-size: 14px; font-weight: 500; }
-.height { font-size: 13px; color: #666; margin: 2px 0 6px; }
+.height { font-size: 13px; color: #666; margin: 2px 0 3px; }
+.location { font-size: 12px; color: #777; margin-bottom: 7px; }
 .status { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 5px; margin-bottom: 8px; }
 .status.available { background: #eaf3de; color: #3b6d11; }
 .status.claimed-tag { background: #f1efe8; color: #5f5e5a; }
@@ -55,6 +56,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 1</div>
         <div class="height">5'3"</div>
+        <div class="location">12th floor — Reception</div>
         <div class="status available" id="status-1">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-1" />
         <button onclick="claim(1)">Claim ↗</button>
@@ -68,6 +70,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 2</div>
         <div class="height">4'10"</div>
+        <div class="location">12th floor — Waiting Room</div>
         <div class="status available" id="status-2">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-2" />
         <button onclick="claim(2)">Claim ↗</button>
@@ -81,6 +84,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 3</div>
         <div class="height">4'11"</div>
+        <div class="location">12th floor — Dome</div>
         <div class="status available" id="status-3">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-3" />
         <button onclick="claim(3)">Claim ↗</button>
@@ -94,6 +98,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 4</div>
         <div class="height">6'11"</div>
+        <div class="location">12th floor — Waiting Room</div>
         <div class="status available" id="status-4">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-4" />
         <button onclick="claim(4)">Claim ↗</button>
@@ -107,6 +112,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 5</div>
         <div class="height">6'6"</div>
+        <div class="location">12th floor — Barrel</div>
         <div class="status available" id="status-5">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-5" />
         <button onclick="claim(5)">Claim ↗</button>
@@ -120,6 +126,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 6</div>
         <div class="height">2'10"</div>
+        <div class="location">11th floor — Meeting Room</div>
         <div class="status available" id="status-6">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-6" />
         <button onclick="claim(6)">Claim ↗</button>
@@ -133,6 +140,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 7</div>
         <div class="height">3'7"</div>
+        <div class="location">11th floor — Meeting Room</div>
         <div class="status available" id="status-7">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-7" />
         <button onclick="claim(7)">Claim ↗</button>
@@ -146,6 +154,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 8</div>
         <div class="height">6'6"</div>
+        <div class="location">11th floor — Meeting Room</div>
         <div class="status available" id="status-8">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-8" />
         <button onclick="claim(8)">Claim ↗</button>
@@ -159,6 +168,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 9</div>
         <div class="height">1'11"</div>
+        <div class="location">11th floor — Meeting Room</div>
         <div class="status available" id="status-9">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-9" />
         <button onclick="claim(9)">Claim ↗</button>
@@ -172,6 +182,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 10</div>
         <div class="height">0'7"</div>
+        <div class="location">11th floor — Meeting Room</div>
         <div class="status available" id="status-10">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-10" />
         <button onclick="claim(10)">Claim ↗</button>
@@ -185,6 +196,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 11</div>
         <div class="height">1'10"</div>
+        <div class="location">11th floor — Meeting Room</div>
         <div class="status available" id="status-11">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-11" />
         <button onclick="claim(11)">Claim ↗</button>
@@ -198,6 +210,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 12</div>
         <div class="height">1'11"</div>
+        <div class="location">11th floor — Meeting Room</div>
         <div class="status available" id="status-12">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-12" />
         <button onclick="claim(12)">Claim ↗</button>
@@ -211,6 +224,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 13</div>
         <div class="height">6'5"</div>
+        <div class="location">11th floor — Meeting Room</div>
         <div class="status available" id="status-13">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-13" />
         <button onclick="claim(13)">Claim ↗</button>
@@ -224,6 +238,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 14</div>
         <div class="height">4'7"</div>
+        <div class="location">11th floor — Paradigm Sign</div>
         <div class="status available" id="status-14">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-14" />
         <button onclick="claim(14)">Claim ↗</button>
@@ -237,6 +252,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 15</div>
         <div class="height">4'7"</div>
+        <div class="location">11th floor — Paradigm Sign</div>
         <div class="status available" id="status-15">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-15" />
         <button onclick="claim(15)">Claim ↗</button>
@@ -250,6 +266,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 16</div>
         <div class="height">4'7"</div>
+        <div class="location">11th floor — Paradigm Sign</div>
         <div class="status available" id="status-16">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-16" />
         <button onclick="claim(16)">Claim ↗</button>
@@ -263,6 +280,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 17</div>
         <div class="height">6'5"</div>
+        <div class="location">11th floor — Work Zone I&R</div>
         <div class="status available" id="status-17">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-17" />
         <button onclick="claim(17)">Claim ↗</button>
@@ -276,6 +294,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 18</div>
         <div class="height">8'</div>
+        <div class="location">11th floor — Work Zone I&R</div>
         <div class="status available" id="status-18">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-18" />
         <button onclick="claim(18)">Claim ↗</button>
@@ -289,6 +308,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 19</div>
         <div class="height">~8'2"</div>
+        <div class="location">11th floor — Work Zone I&R</div>
         <div class="status available" id="status-19">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-19" />
         <button onclick="claim(19)">Claim ↗</button>
@@ -302,6 +322,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 20</div>
         <div class="height">8'</div>
+        <div class="location">11th floor — Work Zone I&R</div>
         <div class="status available" id="status-20">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-20" />
         <button onclick="claim(20)">Claim ↗</button>
@@ -315,6 +336,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 21</div>
         <div class="height">2'7"</div>
+        <div class="location">11th floor — Work Zone I&R</div>
         <div class="status available" id="status-21">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-21" />
         <button onclick="claim(21)">Claim ↗</button>
@@ -328,6 +350,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 22</div>
         <div class="height">6'</div>
+        <div class="location">11th floor — Work Zone I&R</div>
         <div class="status available" id="status-22">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-22" />
         <button onclick="claim(22)">Claim ↗</button>
@@ -341,6 +364,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 23</div>
         <div class="height">5'3"</div>
+        <div class="location">11th floor — Work Zone I&R</div>
         <div class="status available" id="status-23">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-23" />
         <button onclick="claim(23)">Claim ↗</button>
@@ -354,6 +378,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 24</div>
         <div class="height">8'</div>
+        <div class="location">11th floor — Work Zone I&R</div>
         <div class="status available" id="status-24">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-24" />
         <button onclick="claim(24)">Claim ↗</button>
@@ -367,6 +392,7 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 25</div>
         <div class="height">5'6"</div>
+        <div class="location">11th floor — Work Zone I&R</div>
         <div class="status available" id="status-25">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-25" />
         <button onclick="claim(25)">Claim ↗</button>
@@ -380,89 +406,138 @@ button:hover { background: #f0f0ec; }
       <div class="info">
         <div class="plant-id">Plant 26</div>
         <div class="height">3'7"</div>
+        <div class="location">11th floor — Work Zone I&R</div>
         <div class="status available" id="status-26">Available</div>
         <input class="claimer" type="text" placeholder="Your name to claim" id="input-26" />
         <button onclick="claim(26)">Claim ↗</button>
       </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const claimed = {};
-function claim(n) {
-  const input = document.getElementById('input-' + n);
-  const name = input.value.trim();
-  if (!name) { input.style.borderColor = '#e24b4a'; return; }
-  input.style.borderColor = '#ccc';
-  claimed[n] = name;
-  document.getElementById('status-' + n).textContent = 'Claimed by ' + name;
-  document.getElementById('status-' + n).className = 'status claimed-tag';
-  document.getElementById('plant-' + n).classList.add('claimed');
-  input.disabled = true;
-  input.closest('.card').querySelector('button').disabled = true;
-  input.closest('.card').querySelector('button').textContent = 'Claimed';
-  updateCounts();
-}
-function updateCounts() {
-  const total = 26;
-  const c = Object.keys(claimed).length;
-  document.getElementById('count-claimed').textContent = c;
-  document.getElementById('count-available').textContent = total - c;
-}
-function filter(type, btn) {
-  document.querySelectorAll('.filter-bar button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.card').forEach(card => {
-    const isClaimed = card.classList.contains('claimed');
-    if (type === 'all') card.style.display = '';
-    else if (type === 'available') card.style.display = isClaimed ? 'none' : '';
-    else if (type === 'claimed') card.style.display = isClaimed ? '' : 'none';
-  });
-}
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-const supabase = window.supabase.createClient(
+const supabaseClient = window.supabase.createClient(
   "https://gtlgilasbrofdypixutx.supabase.co",
   "sb_publishable_TOKRtRulLWFoGDWLaIhWRA_2xoGfv7z"
 );
 
-async function loadPlants() {
-  const { data } = await supabase.from("plants").select("*");
-  if (!data) return;
+let claimed = {};
+let currentFilter = 'all';
 
-  data.forEach(p => {
-    if (p.claimed) {
-      const card = document.getElementById(`plant-${p.id}`);
-      const status = document.getElementById(`status-${p.id}`);
+async function loadClaims() {
+  const { data, error } = await supabaseClient
+    .from('plants')
+    .select('id, claimed, claimer');
 
-      if (!card) return;
+  if (error) {
+    console.error('Supabase load error:', error);
+    alert('Could not load claims from Supabase. Check your Supabase table/policies.');
+    return;
+  }
 
-      card.classList.add("claimed");
-      status.textContent = `Claimed by ${p.claimer}`;
-      status.classList.remove("available");
-      status.classList.add("claimed-tag");
+  claimed = {};
+  (data || []).forEach(row => {
+    if (row.claimed && row.claimer) {
+      claimed[String(row.id)] = row.claimer;
     }
   });
+
+  renderAllPlants();
 }
 
-async function claim(id) {
-  const input = document.getElementById(`input-${id}`);
+async function claim(n) {
+  const input = document.getElementById('input-' + n);
   const name = input.value.trim();
 
-  if (!name) return alert("Enter your name");
+  if (!name) {
+    input.style.borderColor = '#e24b4a';
+    input.focus();
+    return;
+  }
 
-  await supabase.from("plants").upsert({
-    id: id,
-    claimed: true,
-    claimer: name,
-    claimed_at: new Date()
-  });
+  input.style.borderColor = '#ccc';
 
-  loadPlants();
+  const { error } = await supabaseClient
+    .from('plants')
+    .upsert({
+      id: n,
+      claimed: true,
+      claimer: name,
+      claimed_at: new Date().toISOString()
+    }, { onConflict: 'id' });
+
+  if (error) {
+    console.error('Supabase save error:', error);
+    alert('Could not save this claim. Check Supabase policies/table.');
+    return;
+  }
+
+  await loadClaims();
 }
 
-setInterval(loadPlants, 2000);
-loadPlants();
+function renderPlant(n) {
+  const input = document.getElementById('input-' + n);
+  const status = document.getElementById('status-' + n);
+  const card = document.getElementById('plant-' + n);
+  if (!input || !status || !card) return;
+
+  const button = card.querySelector('button');
+  const name = claimed[String(n)];
+
+  if (name) {
+    status.textContent = 'Claimed by ' + name;
+    status.className = 'status claimed-tag';
+    card.classList.add('claimed');
+    input.value = name;
+    input.disabled = true;
+    button.disabled = true;
+    button.textContent = 'Claimed';
+  } else {
+    status.textContent = 'Available';
+    status.className = 'status available';
+    card.classList.remove('claimed');
+    input.value = '';
+    input.disabled = false;
+    button.disabled = false;
+    button.textContent = 'Claim ↗';
+  }
+}
+
+function renderAllPlants() {
+  document.querySelectorAll('.card').forEach(card => {
+    const n = card.id.replace('plant-', '');
+    renderPlant(n);
+  });
+  updateCounts();
+  applyCurrentFilter();
+}
+
+function updateCounts() {
+  const total = document.querySelectorAll('.card').length;
+  const c = Object.keys(claimed).length;
+  document.getElementById('count-claimed').textContent = c;
+  document.getElementById('count-available').textContent = total - c;
+}
+
+function filter(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('.filter-bar button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyCurrentFilter();
+}
+
+function applyCurrentFilter() {
+  document.querySelectorAll('.card').forEach(card => {
+    const isClaimed = card.classList.contains('claimed');
+    if (currentFilter === 'all') card.style.display = '';
+    else if (currentFilter === 'available') card.style.display = isClaimed ? 'none' : '';
+    else if (currentFilter === 'claimed') card.style.display = isClaimed ? '' : 'none';
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadClaims();
+  setInterval(loadClaims, 2000);
+});
 </script>
 </body>
 </html>
