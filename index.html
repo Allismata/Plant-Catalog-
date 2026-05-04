@@ -389,17 +389,8 @@ document.querySelectorAll("input.name").forEach(input => {
   alt="Plant ${p.id}" 
   loading="lazy"
   onerror="this.style.display='none'"
-    if (!this.dataset.triedImages) {
-      this.dataset.triedImages = '1';
-      this.src = 'images/' + this.getAttribute('src');
-    } else if (this.dataset.triedImages === '1') {
-      this.dataset.triedImages = '2';
-      this.src = this.getAttribute('src').replace('.jpg', '.jpeg');
-    } else {
-      this.style.display = 'none';
-    }
-  "
->        <div class="content">
+>
+<div class="content">
           <div class="topline">
             <div class="plant-id">Plant ${p.id}</div>
             <div class="badge">${p.floor} floor</div>
@@ -410,9 +401,9 @@ document.querySelectorAll("input.name").forEach(input => {
           </div>
           <div class="status ${isClaimed ? "claimed" : ""}" id="status-${p.id}">${status}</div>
           <div class="actions">
-            <div class="claim-row ${isClaimed ? "hidden" : ""}">
-<input class="name" id="input-${p.id}" placeholder="Your name" autocomplete="name" value="${escapeHtml(typedNames[`input-${p.id}`] || "")}" />              <button class="btn" onclick="claimPlant(${p.id})">Claim</button>
-            </div>
+          <div class="claim-row ${isClaimed ? "hidden" : ""}">
+  <button class="btn" onclick="claimPlant(${p.id})">Claim this plant</button>
+</div>
             <button class="btn secondary ${isMine ? "" : "hidden"}" onclick="unclaimMine(${p.id})">Unclaim my plant</button>
             <button class="btn danger ${adminMode ? "" : "hidden"}" onclick="adminUnclaim(${p.id})">Admin unclaim</button>
           </div>
@@ -434,18 +425,19 @@ async function loadClaims() {
 }
 
 async function claimPlant(id) {
-  const input = document.getElementById(`input-${id}`);
-  const name = (input?.value || "").trim();
-  if (!name) { alert("Please enter your name first."); return; }
+  const name = prompt("Enter your name to claim this plant:");
+  if (!name || !name.trim()) return;
+
+  const cleanName = name.trim();
 
   const existing = claims[id];
   if (existing?.claimed) { alert("Sorry, this plant was already claimed."); await loadClaims(); return; }
 
   const { error } = await supabaseClient.from("plants").upsert({
-    id, claimed: true, claimer: name, claimed_at: new Date().toISOString()
+    id, claimed: true, claimer: cleanName, claimed_at: new Date().toISOString()
   });
   if (error) { alert("Something went wrong while claiming. Try again."); console.error(error); return; }
-  saveMyClaim(id, name);
+  saveMyClaim(id, cleanName);
   await loadClaims();
 }
 
