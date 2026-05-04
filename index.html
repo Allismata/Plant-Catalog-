@@ -498,7 +498,13 @@ document.querySelectorAll(".filter").forEach(btn => {
 });
 
 loadClaims();
-setInterval(loadClaims, 19000);
-</script>
+setInterval(() => {
+  const active = document.activeElement;
+  const typing = active && active.classList.contains("name");
+
+  if (!typing) {
+    loadClaims();
+  }
+}, 3000);</script>
 </body>
 </html>
